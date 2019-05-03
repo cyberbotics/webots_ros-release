@@ -19,6 +19,3 @@ Versions of tools used:
 - rosdep version: `0.15.1`
 - rosdistro version: `0.7.3`
 - vcstools version: `0.1.40`
-
-
-# webots_ros-release
