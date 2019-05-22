@@ -1,0 +1,12 @@
+Source: ros-lunar-webots-ros
+Section: misc
+Priority: extra
+Maintainer: Cyberbotics <support@cyberbotics.com>
+Build-Depends: debhelper (>= 9.0.0), ros-lunar-catkin, ros-lunar-message-generation, ros-lunar-roscpp, ros-lunar-rospy, ros-lunar-sensor-msgs, ros-lunar-std-msgs, ros-lunar-tf
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-lunar-webots-ros
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-lunar-message-runtime, ros-lunar-roscpp, ros-lunar-rospy, ros-lunar-sensor-msgs, ros-lunar-std-msgs, ros-lunar-tf
+Description: The ROS package containing examples for interfacing ROS with the standard ROS controller of Webots
