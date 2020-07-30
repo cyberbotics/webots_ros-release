@@ -1,3 +1,26 @@
+## webots_ros (melodic) - 2.1.0-1
+
+The packages in the `webots_ros` repository were released into the `melodic` distro by running `/usr/bin/bloom-release --rosdistro melodic --track melodic webots_ros --edit` on `Thu, 30 Jul 2020 11:37:57 -0000`
+
+The `webots_ros` package was released.
+
+Version of package(s) in repository `webots_ros`:
+
+- upstream repository: https://github.com/cyberbotics/webots_ros.git
+- release repository: https://github.com/cyberbotics/webots_ros-release.git
+- rosdistro version: `2.0.6-1`
+- old version: `2.0.6-1`
+- new version: `2.1.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.9.7`
+- catkin_pkg version: `0.4.22`
+- rosdep version: `0.19.0`
+- rosdistro version: `0.8.2`
+- vcstools version: `0.1.42`
+
+
 ## webots_ros (kinetic) - 2.1.0-1
 
 The packages in the `webots_ros` repository were released into the `kinetic` distro by running `/usr/bin/bloom-release --rosdistro kinetic --track kinetic webots_ros --edit` on `Thu, 30 Jul 2020 11:35:11 -0000`
