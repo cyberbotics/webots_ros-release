@@ -17,12 +17,12 @@ tracks:
     name: webots_ros
     patches: null
     release_inc: '1'
-    release_repo_url: https://github.com/cyberbotics/webots_ros-release.git
-    release_tag: 2.1.0
+    release_repo_url: null
+    release_tag: 2.1.1
     ros_distro: kinetic
     vcs_type: git
     vcs_uri: https://github.com/cyberbotics/webots_ros.git
-    version: 2.1.0
+    version: 2.1.1
   lunar:
     actions:
     - bloom-export-upstream :{vcs_local_uri} :{vcs_type} --tag :{release_tag} --display-uri
