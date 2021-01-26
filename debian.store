@@ -1,1 +1,1 @@
-{"trim": "", "base": "31e3bd1", "trimbase": "", "parent": "debian/noetic/webots_ros", "previous": "2ecff5a"}
+{"base": "548c43a", "parent": "debian/noetic/webots_ros", "previous": "fdda0f7", "trim": "", "trimbase": ""}
