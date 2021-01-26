@@ -85,15 +85,17 @@ tracks:
     - git-bloom-generate -y rosdebian --prefix release/:{ros_distro} :{ros_distro}
       -i :{release_inc} --os-name debian --os-not-required
     - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
-      :{release_inc}
+      :{release_inc} --os-name fedora
+    - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
+      :{release_inc} --os-name rhel
     devel_branch: noetic
     last_version: 2.1.1
     name: webots_ros
     patches: null
     release_inc: '1'
     release_repo_url: null
-    release_tag: 2.1.1
+    release_tag: 4.0.0
     ros_distro: noetic
     vcs_type: git
     vcs_uri: https://github.com/cyberbotics/webots_ros.git
-    version: 2.1.1
+    version: 4.0.0
