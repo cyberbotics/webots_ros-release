@@ -1,3 +1,26 @@
+## webots_ros (noetic) - 4.1.0-1
+
+The packages in the `webots_ros` repository were released into the `noetic` distro by running `/usr/bin/bloom-release --rosdistro noetic --track noetic webots_ros --edit` on `Fri, 16 Jul 2021 15:07:15 -0000`
+
+The `webots_ros` package was released.
+
+Version of package(s) in repository `webots_ros`:
+
+- upstream repository: https://github.com/cyberbotics/webots_ros.git
+- release repository: https://github.com/cyberbotics/webots_ros-release.git
+- rosdistro version: `4.0.1-1`
+- old version: `4.0.1-1`
+- new version: `4.1.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.10.7`
+- catkin_pkg version: `0.4.23`
+- rosdep version: `0.21.0`
+- rosdistro version: `0.8.3`
+- vcstools version: `0.1.42`
+
+
 ## webots_ros (noetic) - 4.0.1-1
 
 The packages in the `webots_ros` repository were released into the `noetic` distro by running `/home/lukic/.local/bin/bloom-release --rosdistro noetic --track noetic webots_ros --edit` on `Tue, 02 Feb 2021 21:40:22 -0000`
