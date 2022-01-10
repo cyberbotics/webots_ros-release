@@ -62,17 +62,17 @@ tracks:
       :{release_inc} --os-name fedora
     - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
       :{release_inc} --os-name rhel
-    devel_branch: melodic
-    last_version: 4.1.0
+    devel_branch: master
+    last_version: 5.0.1
     name: webots_ros
     patches: null
     release_inc: '1'
     release_repo_url: null
-    release_tag: 4.1.0
+    release_tag: 5.0.1
     ros_distro: melodic
     vcs_type: git
     vcs_uri: https://github.com/cyberbotics/webots_ros.git
-    version: 4.1.0
+    version: 5.0.1
   noetic:
     actions:
     - bloom-export-upstream :{vcs_local_uri} :{vcs_type} --tag :{release_tag} --display-uri
@@ -88,14 +88,14 @@ tracks:
       :{release_inc} --os-name fedora
     - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
       :{release_inc} --os-name rhel
-    devel_branch: noetic
-    last_version: 4.1.0
+    devel_branch: master
+    last_version: 5.0.1
     name: webots_ros
     patches: null
     release_inc: '1'
     release_repo_url: null
-    release_tag: 4.1.0
+    release_tag: 5.0.1
     ros_distro: noetic
     vcs_type: git
     vcs_uri: https://github.com/cyberbotics/webots_ros.git
-    version: 4.1.0
+    version: 5.0.1
