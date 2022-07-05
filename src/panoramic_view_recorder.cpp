@@ -14,6 +14,7 @@
 
 #include <signal.h>
 #include "ros/ros.h"
+#include "tf/tf.h"
 
 #include <webots_ros/get_bool.h>
 #include <webots_ros/get_int.h>
@@ -22,7 +23,7 @@
 
 #include <webots_ros/field_get_node.h>
 #include <webots_ros/field_get_rotation.h>
-#include <webots_ros/field_get_type_name.h>
+#include <webots_ros/field_get_name.h>
 #include <webots_ros/field_get_vec3f.h>
 #include <webots_ros/field_set_rotation.h>
 #include <webots_ros/field_set_vec3f.h>
@@ -197,16 +198,21 @@ int main(int argc, char **argv) {
   else
     ROS_ERROR("Failed to call service movie_start_recording.");
 
-  double angle = 0.0;
-  while (angle < 6.28) {  // we start at angle 0 and end at angle 2*pi
+  double angle = -M_PI;
+  while (angle < M_PI) {  // we start at angle -pi and end at angle pi
     angle += 0.05;
-    setPovOrientationSrv.request.value.w = cos(0.5 * angle);
-    setPovOrientationSrv.request.value.y = sin(0.5 * angle);
-    double cosAngle = cos(angle);
-    double sinAngle = sin(angle);
+    tf::Quaternion q;
+    q.setEuler(0, 0, angle);
+    setPovOrientationSrv.request.value.w = q.getW();
+    setPovOrientationSrv.request.value.x = q.getX();
+    setPovOrientationSrv.request.value.y = q.getY();
+    setPovOrientationSrv.request.value.z = q.getZ();
+    double cosAngle = cos(angle + M_PI);
+    double sinAngle = sin(angle + M_PI);
     if (setPovOrientationClient.call(setPovOrientationSrv) && setPovOrientationSrv.response.success == 1) {
-      setPovPositionSrv.request.value.x = initialPovPosition.z * sinAngle;
-      setPovPositionSrv.request.value.z = initialPovPosition.z * cosAngle;
+      setPovPositionSrv.request.value.x = initialPovPosition.x * cosAngle;
+      setPovPositionSrv.request.value.y = initialPovPosition.x * sinAngle;
+      setPovPositionSrv.request.value.z = 0.5;
       if (setPositionClient.call(setPovPositionSrv) && setPovPositionSrv.response.success == 1) {
         if (!timeStepClient.call(timeStepSrv) || !timeStepSrv.response.success)
           ROS_ERROR("Couldn't update robot step.");

@@ -1,10 +1,9 @@
-#VRML_SIM R2020b utf8
+#VRML_SIM R2022a utf8
 WorldInfo {
-  coordinateSystem "NUE"
 }
 Viewpoint {
-  orientation -0.6194591910547989 0.7334082212488283 0.27996909047672397 0.888923
-  position 1.67801 1.75743 2.04642
+  orientation -0.24553688795558432 0.5497699338555154 0.7984138378570284 0.9950228636310111
+  position -1.9648242833666822 -1.9443813341212814 1.756260953194378
 }
 TexturedBackground {
 }
@@ -13,8 +12,8 @@ TexturedBackgroundLight {
 DEF GROUND RectangleArena {
 }
 Solid {
-  translation 0.182984 0.05 0.12186
-  rotation 0 -1 0 0.934348
+  translation 0.182984 -0.12186 0.05
+  rotation 0.814092969139429 -0.410641350571121 -0.410641350571121 1.775041980102555
   children [
     Shape {
       appearance PBRAppearance {
@@ -34,7 +33,7 @@ Solid {
   }
 }
 DEF CONE Solid {
-  translation 0.240484 0.1 -0.258217
+  translation 0.240484 0.258217 0.1
   children [
     Shape {
       appearance PBRAppearance {
@@ -43,16 +42,29 @@ DEF CONE Solid {
         metalness 0
         emissiveColor 0.027451 0.027451 0.968627
       }
-      geometry Cone {
+      geometry DEF CONE_SHAPE Cone {
         bottomRadius 0.08
         height 0.2
       }
     }
   ]
   name "solid(1)"
+  boundingObject Transform {
+    translation 0 -0.04 0
+    children [
+      Box {
+        size 0.1 0.1 0.1
+      }
+    ]
+  }
+  physics Physics {
+  }
+  recognitionColors [
+    0.988235 0.913725 0.309804
+  ]
 }
 DEF RADAR_TARGET Solid {
-  translation 0 0 -1.86
+  translation 0 1.86 0
   children [
     Shape {
       appearance PBRAppearance {
@@ -70,9 +82,14 @@ DEF RADAR_TARGET Solid {
   radarCrossSection 1
 }
 Robot {
-  translation 0 0.1 0
+  translation 0 0 0.1
   children [
+    Altimeter {
+    }
     SliderJoint {
+      jointParameters JointParameters {
+        axis 0 1 0
+      }
       device [
         Brake {
           name "my_brake"
@@ -80,11 +97,11 @@ Robot {
         LinearMotor {
           name "linear_motor"
           maxPosition 100
+          multiplier 1.5
         }
       ]
       endPoint Solid {
         translation -0.12 0 0
-        rotation 1 0 0 1.57
         children [
           Shape {
             appearance PBRAppearance {
@@ -101,17 +118,20 @@ Robot {
         boundingObject Box {
           size 0.02 0.25 0.08
         }
+        physics Physics {
+        }
       }
     }
-    HingeJoint {
+    DEF HINGE_JOINT HingeJoint {
+      jointParameters HingeJointParameters {
+      }
       device [
         PositionSensor {
           name "position_sensor"
         }
       ]
       endPoint Solid {
-        translation 0 0 -0.15
-        rotation 1 0 0 0
+        translation 0 0.15 0
         children [
           Shape {
             appearance PBRAppearance {
@@ -129,6 +149,8 @@ Robot {
           height 0.1
           radius 0.05
         }
+        physics Physics {
+        }
       }
     }
     HingeJoint {
@@ -136,12 +158,13 @@ Robot {
         RotationalMotor {
           name "rotational_motor"
           acceleration 5
-          maxVelocity 2
+          maxVelocity 2.5
+          multiplier 2.5
         }
       ]
       endPoint DEF TEST2 Solid {
-        translation 0.12 0.05 0
-        rotation 1 0 0 0
+        translation 0.12 0 0.05
+        rotation 1 0 0 1.5708
         children [
           Shape {
             appearance PBRAppearance {
@@ -164,6 +187,7 @@ Robot {
     }
     Camera {
       translation 0.14 0 0
+      rotation 0 0 1 1.5708
       model "camera model"
       focus Focus {
         focalDistance 0.2
@@ -176,14 +200,17 @@ Robot {
         minFieldOfView 0.49
       }
       recognition Recognition {
+        segmentation TRUE
       }
     }
     RangeFinder {
       translation 0.14 0 0
+      rotation 0 0 1 1.5707996938995747
       name "range_finder"
       model "range-finder model"
     }
     Lidar {
+      rotation 0 0 1 1.5708
     }
     DEF TEST Compass {
     }
@@ -215,9 +242,10 @@ Robot {
     }
     InertialUnit {
       name "inertial_unit"
+      noise 1e-05
     }
     LED {
-      translation 0.1 0.05 0.1
+      translation 0.1 -0.1 0.05
       children [
         Shape {
           appearance PBRAppearance {
@@ -231,6 +259,8 @@ Robot {
       ]
       boundingObject Sphere {
         radius 0.02
+      }
+      physics Physics {
       }
       color [
         0.666667 1 1
@@ -259,7 +289,15 @@ Robot {
     Accelerometer {
     }
     Radar {
+      rotation 0 0 1 1.5707996938995747
       maxRange 2
+    }
+    CharacterSkin {
+      translation -0.35 0 -0.1
+      rotation 0.707107781185531 0 0.70710578118615 -3.1415853071795863
+      scale 0.5 0.5 0.5
+      name "Sophia"
+      model "Sophia"
     }
   ]
   name "full_supervisor"
@@ -267,6 +305,11 @@ Robot {
   boundingObject Box {
     size 0.2 0.2 0.2
   }
+  physics Physics {
+  }
+  recognitionColors [
+    0.678431 0.498039 0.658824
+  ]
   controller "ros"
   controllerArgs [
     "--name=my_robot"
@@ -276,7 +319,15 @@ Robot {
   customData "INITIAL"
   supervisor TRUE
   battery [
-    10, 10, 2
+    1000, 1000, 50
   ]
+  cpuConsumption 0.01
   window "info"
+}
+DEF ANOTHER_ROBOT Robot {
+  children [
+    Emitter {
+    }
+  ]
+  controller "complete_test_emitter"
 }

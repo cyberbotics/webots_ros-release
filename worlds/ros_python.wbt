@@ -1,11 +1,10 @@
-#VRML_SIM R2020b utf8
+#VRML_SIM R2022a utf8
 WorldInfo {
   info [
     "Simple Thymio II simulation controlled by a ROS node written in Python."
   ]
   title "ROS Python"
   basicTimeStep 20
-  coordinateSystem "NUE"
   contactProperties [
     ContactProperties {
       material2 "thymio body"
@@ -16,8 +15,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.3650235088419984 -0.9018337571390201 -0.2312005892665386 5.0279702
-  position 0.85252477 0.55969193 0.54871339
+  orientation -0.12789900706026552 0.665017585233845 0.7357944382249323 0.7145183264380753
+  position -2.4922945423620355 -1.498033875852477 1.4599981930184418
   follow "Thymio II"
 }
 TexturedBackground {
@@ -25,10 +24,11 @@ TexturedBackground {
 TexturedBackgroundLight {
 }
 CircleArena {
+  rotation 0 0 1 1.5707963267948966
   wallThickness 0.05
 }
 DEF THYMIO2 Thymio2 {
-  rotation 1 0 0 0
+  rotation 0 0 1 -1.570796326794897
   controller "<extern>"
   controllerArgs []
 }
