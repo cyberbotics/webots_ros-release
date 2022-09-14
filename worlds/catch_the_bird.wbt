@@ -1,4 +1,9 @@
-#VRML_SIM R2022a utf8
+#VRML_SIM R2022b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/floors/protos/RectangleArena.proto"
+
 WorldInfo {
 }
 Viewpoint {
@@ -28,6 +33,7 @@ Robot {
         rotation 1 0 0 1.5708
         children [
           RangeFinder {
+            name "range_finder"  # override default "range-finder" name as valid characters for ROS service/topic names are a-z, A-Z, 0-9, / and _, excluding the dash "-".
             translation 0 0 -0.05
             rotation -0.577349935856137 0.577349935856137 0.5773509358560258 2.09439
           }
