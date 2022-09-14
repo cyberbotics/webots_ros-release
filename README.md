@@ -1,3 +1,26 @@
+## webots_ros (noetic) - 2022.1.0-1
+
+The packages in the `webots_ros` repository were released into the `noetic` distro by running `/usr/bin/bloom-release --rosdistro noetic --track noetic webots_ros --edit` on `Wed, 14 Sep 2022 08:13:38 -0000`
+
+The `webots_ros` package was released.
+
+Version of package(s) in repository `webots_ros`:
+
+- upstream repository: https://github.com/cyberbotics/webots_ros.git
+- release repository: https://github.com/cyberbotics/webots_ros-release.git
+- rosdistro version: `5.0.1-2`
+- old version: `5.0.1-2`
+- new version: `2022.1.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.11.2`
+- catkin_pkg version: `0.5.2`
+- rosdep version: `0.22.1`
+- rosdistro version: `0.9.0`
+- vcstools version: `0.1.42`
+
+
 ## webots_ros (noetic) - 5.0.1-2
 
 The packages in the `webots_ros` repository were released into the `noetic` distro by running `/home/benjamin/.local/bin/bloom-release --rosdistro noetic webots_ros --edit` on `Mon, 10 Jan 2022 09:47:05 -0000`
