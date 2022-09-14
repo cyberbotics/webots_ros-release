@@ -67,7 +67,6 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs sensor_msgs messag
     field_get_name.srv
     field_get_vec2f.srv
     field_get_vec3f.srv
-    field_import_node.srv
     field_import_node_from_string.srv
     field_remove_node.srv
     field_remove.srv
@@ -100,13 +99,10 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs sensor_msgs messag
     node_enable_contact_points_tracking.srv
     node_enable_pose_tracking.srv
     node_get_center_of_mass.srv
-    node_get_contact_point.srv
     node_get_contact_points.srv
-    node_get_contact_point_node.srv
     node_get_field.srv
     node_get_field_by_index.srv
     node_get_id.srv
-    node_get_number_of_contact_points.srv
     node_get_number_of_fields.srv
     node_get_name.srv
     node_get_orientation.srv
@@ -289,4 +285,7 @@ install(DIRECTORY worlds
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
 install(DIRECTORY config
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+
+install(DIRECTORY controllers
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

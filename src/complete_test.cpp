@@ -1,4 +1,4 @@
-// Copyright 1996-2020 Cyberbotics Ltd.
+// Copyright 1996-2022 Cyberbotics Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -83,7 +83,6 @@
 #include <webots_ros/field_get_type.h>
 #include <webots_ros/field_get_vec2f.h>
 #include <webots_ros/field_get_vec3f.h>
-#include <webots_ros/field_import_node.h>
 #include <webots_ros/field_remove.h>
 #include <webots_ros/field_set_bool.h>
 #include <webots_ros/field_set_color.h>
@@ -103,14 +102,11 @@
 #include <webots_ros/node_enable_contact_points_tracking.h>
 #include <webots_ros/node_enable_pose_tracking.h>
 #include <webots_ros/node_get_center_of_mass.h>
-#include <webots_ros/node_get_contact_point.h>
-#include <webots_ros/node_get_contact_point_node.h>
 #include <webots_ros/node_get_contact_points.h>
 #include <webots_ros/node_get_field.h>
 #include <webots_ros/node_get_field_by_index.h>
 #include <webots_ros/node_get_id.h>
 #include <webots_ros/node_get_name.h>
-#include <webots_ros/node_get_number_of_contact_points.h>
 #include <webots_ros/node_get_number_of_fields.h>
 #include <webots_ros/node_get_orientation.h>
 #include <webots_ros/node_get_parent_node.h>
@@ -170,7 +166,7 @@ static bool callbackCalled = false;
 ros::ServiceClient time_step_client;
 webots_ros::set_int time_step_srv;
 
-static bool doubleIsEqual(double value, double expected, double delta){
+static bool doubleIsEqual(double value, double expected, double delta) {
   return ((isnan(value) && isnan(expected)) || (isinf(value) && isinf(expected)) || (fabs((value) - (expected)) <= (delta)));
 }
 
@@ -310,9 +306,8 @@ void GPSSpeedVectorCallback(const geometry_msgs::PointStamped::ConstPtr &values)
   GPSSpeedVectorValues[1] = values->point.y;
   GPSSpeedVectorValues[2] = values->point.z;
 
-  ROS_INFO("GPS speed vector values are x=%f y=%f z=%f (time: %d:%d).",
-           GPSSpeedVectorValues[0], GPSSpeedVectorValues[1], GPSSpeedVectorValues[2],
-           values->header.stamp.sec, values->header.stamp.nsec);
+  ROS_INFO("GPS speed vector values are x=%f y=%f z=%f (time: %d:%d).", GPSSpeedVectorValues[0], GPSSpeedVectorValues[1],
+           GPSSpeedVectorValues[2], values->header.stamp.sec, values->header.stamp.nsec);
   callbackCalled = true;
 }
 
@@ -582,18 +577,6 @@ int main(int argc, char **argv) {
   get_time_client.shutdown();
   time_step_client.call(time_step_srv);
 
-  ros::ServiceClient get_type_client = n.serviceClient<webots_ros::get_int>(model_name + "/robot/get_type");
-  webots_ros::get_int get_type_srv;
-
-  if (get_type_client.call(get_type_srv)) {
-    int type = get_type_srv.response.value;
-    ROS_INFO("Type of %s is %d.", model_name.c_str(), type);
-  } else
-    ROS_ERROR("Failed to call service get_type.");
-
-  get_type_client.shutdown();
-  time_step_client.call(time_step_srv);
-
   ros::ServiceClient robot_set_custom_data_client =
     n.serviceClient<webots_ros::set_string>(model_name + "/robot/set_custom_data");
   webots_ros::set_string robot_set_custom_data_srv;
@@ -629,12 +612,15 @@ int main(int argc, char **argv) {
   if (enable_keyboard_client.call(enable_keyboard_srv) && enable_keyboard_srv.response.success) {
     ROS_INFO("Keyboard of %s has been enabled.", model_name.c_str());
     sub_keyboard = n.subscribe(model_name + "/keyboard/key", 1, keyboardCallback);
-    ROS_INFO("Topics for keyboard initialized. PLEASE HIT A KEY!");
-    callbackCalled = false;
-    while (sub_keyboard.getNumPublishers() == 0 || !callbackCalled) {
-      ros::spinOnce();
-      time_step_client.call(time_step_srv);
-    }
+    if (!(std::getenv("CI") && std::getenv("CI") == std::string("true"))) {
+      ROS_INFO("Topics for keyboard initialized. PLEASE HIT A KEY!");
+      callbackCalled = false;
+      while (sub_keyboard.getNumPublishers() == 0 || !callbackCalled) {
+        ros::spinOnce();
+        time_step_client.call(time_step_srv);
+      }
+    } else
+      ROS_WARN("No keyboard input possible in the CI, test skipped.");
     ROS_INFO("Topics for keyboard connected.");
   } else
     ROS_ERROR("Failed to enable keyboard.");
@@ -1077,8 +1063,7 @@ int main(int argc, char **argv) {
 
   ros::ServiceClient sampling_period_altimeter_client;
   webots_ros::get_int sampling_period_altimeter_srv;
-  sampling_period_altimeter_client =
-    n.serviceClient<webots_ros::get_int>(model_name + "/altimeter/get_sampling_period");
+  sampling_period_altimeter_client = n.serviceClient<webots_ros::get_int>(model_name + "/altimeter/get_sampling_period");
 
   altimeter_srv.request.value = 32;
   if (set_altimeter_client.call(altimeter_srv) && altimeter_srv.response.success) {
@@ -1115,7 +1100,6 @@ int main(int argc, char **argv) {
   set_altimeter_client.shutdown();
   sampling_period_altimeter_client.shutdown();
   time_step_client.call(time_step_srv);
-
 
   /////////////////////////////////
   // BATTERY SENSOR METHODS TEST //
@@ -1174,16 +1158,17 @@ int main(int argc, char **argv) {
   ros::ServiceClient set_compass_client;
   webots_ros::set_int compass_srv;
   ros::Subscriber sub_compass_32;
-  set_compass_client = n.serviceClient<webots_ros::set_int>(model_name + "/compass/enable");
+  set_compass_client = n.serviceClient<webots_ros::set_int>(model_name + "/unsanitized_compass_name/enable");
 
   ros::ServiceClient sampling_period_compass_client;
   webots_ros::get_int sampling_period_compass_srv;
-  sampling_period_compass_client = n.serviceClient<webots_ros::get_int>(model_name + "/compass/get_sampling_period");
+  sampling_period_compass_client =
+    n.serviceClient<webots_ros::get_int>(model_name + "/unsanitized_compass_name/get_sampling_period");
 
   compass_srv.request.value = 32;
   if (set_compass_client.call(compass_srv) && compass_srv.response.success == 1) {
     ROS_INFO("Compass enabled.");
-    sub_compass_32 = n.subscribe(model_name + "/compass/values", 1, compassCallback);
+    sub_compass_32 = n.subscribe(model_name + "/unsanitized_compass_name/values", 1, compassCallback);
     callbackCalled = false;
     while (sub_compass_32.getNumPublishers() == 0 || !callbackCalled) {
       ros::spinOnce();
@@ -1198,7 +1183,8 @@ int main(int argc, char **argv) {
 
   ros::ServiceClient lookup_table_compass_client;
   webots_ros::get_float_array lookup_table_compass_srv;
-  lookup_table_compass_client = n.serviceClient<webots_ros::get_float_array>(model_name + "/compass/get_lookup_table");
+  lookup_table_compass_client =
+    n.serviceClient<webots_ros::get_float_array>(model_name + "/unsanitized_compass_name/get_lookup_table");
   if (lookup_table_compass_client.call(lookup_table_compass_srv))
     ROS_INFO("Compass lookup table size = %lu.", lookup_table_compass_srv.response.value.size());
   else
@@ -1986,7 +1972,8 @@ int main(int argc, char **argv) {
   ros::ServiceClient enable_joystick_client = n.serviceClient<webots_ros::set_int>(model_name + "/joystick/enable");
   webots_ros::set_int enable_joystick_srv;
   ros::Subscriber sub_joystick;
-  ros::ServiceClient joystick_is_connected_client = n.serviceClient<webots_ros::get_bool>(model_name + "/joystick/is_connected");
+  ros::ServiceClient joystick_is_connected_client =
+    n.serviceClient<webots_ros::get_bool>(model_name + "/joystick/is_connected");
   webots_ros::get_bool joystick_is_connected_srv;
 
   enable_joystick_srv.request.value = 32;
@@ -2930,8 +2917,8 @@ int main(int argc, char **argv) {
         doubleIsEqual(q.w, 0.95793, 0.00001))
       ROS_INFO("Skin first bone orientation correctly received.");
     else
-      ROS_ERROR("Wrong skin first bone orientation: [%f, %f, %f, %f] instead of [-0.28698, 0.0, 0.0, 0.95793].",
-                q.x, q.y, q.z, q.w);
+      ROS_ERROR("Wrong skin first bone orientation: [%f, %f, %f, %f] instead of [-0.28698, 0.0, 0.0, 0.95793].", q.x, q.y, q.z,
+                q.w);
   } else
     ROS_ERROR("Failed to call service skin_get_bone_orientation.");
   skin_get_bone_orientation_client.shutdown();
@@ -3632,7 +3619,7 @@ int main(int argc, char **argv) {
   webots_ros::supervisor_get_from_string supervisor_get_from_device_srv;
   supervisor_get_from_device_client =
     n.serviceClient<webots_ros::supervisor_get_from_string>(model_name + "/supervisor/get_from_device");
-  supervisor_get_from_device_srv.request.value = "compass";
+  supervisor_get_from_device_srv.request.value = "unsanitized compass name";
   supervisor_get_from_device_client.call(supervisor_get_from_device_srv);
   uint64_t compass_node_from_device = supervisor_get_from_device_srv.response.node;
   if (compass_node_from_device == from_def_node)
@@ -3865,18 +3852,21 @@ int main(int argc, char **argv) {
   else
     ROS_ERROR("Failed to call service robot/wwi_send_text.");
 
-  wwi_send_client.shutdown();
   time_step_client.call(time_step_srv);
 
   ros::ServiceClient wwi_receive_client;
   wwi_receive_client = n.serviceClient<webots_ros::get_string>(model_name + "/robot/wwi_receive_text");
   webots_ros::get_string wwi_receive_srv;
-  if (wwi_receive_client.call(wwi_receive_srv) &&
-      wwi_receive_srv.response.value.compare("Answer: test wwi functions from complete_test controller.") == 0)
-    ROS_INFO("Text from robot window successfully received.");
-  else
-    ROS_ERROR("Failed to call service robot/wwi_receive_text.");
+  ROS_INFO("Waiting for robot window message...");
+  while (!(wwi_receive_client.call(wwi_receive_srv) &&
+           wwi_receive_srv.response.value.compare("Answer: test wwi functions from complete_test controller.") == 0)) {
+    wwi_send_srv.request.value = "test wwi functions from complete_test controller.";
+    wwi_send_client.call(wwi_send_srv);
+    time_step_client.call(time_step_srv);
+  }
+  ROS_INFO("Text from robot window successfully received.");
 
+  wwi_send_client.shutdown();
   wwi_receive_client.shutdown();
   time_step_client.call(time_step_srv);
 
@@ -3884,7 +3874,7 @@ int main(int argc, char **argv) {
   ros::ServiceClient virtual_reality_headset_client;
   webots_ros::get_bool supervisor_virtual_reality_headset_is_used_srv;
   virtual_reality_headset_client =
-    n.serviceClient<webots_ros::get_bool>(model_name + "/supervisor/vitual_reality_headset_is_used");
+    n.serviceClient<webots_ros::get_bool>(model_name + "/supervisor/virtual_reality_headset_is_used");
   virtual_reality_headset_client.call(supervisor_virtual_reality_headset_is_used_srv);
   bool used = supervisor_virtual_reality_headset_is_used_srv.response.value;
   // to test this service we assume no virtual reality headset is connected
@@ -3895,23 +3885,6 @@ int main(int argc, char **argv) {
 
   virtual_reality_headset_client.shutdown();
   time_step_client.call(time_step_srv);
-
-  // test field_import_node
-  // this test is disabled as it needs a webots object file but it will work if you export the cone_test solid from the world
-  // before
-  //  ros::ServiceClient supervisor_field_import_node_client;
-  //  webots_ros::field_import_node supervisor_field_import_node_srv;
-  //  supervisor_field_import_node_client =
-  //  n.serviceClient<webots_ros::field_import_node>(model_name+"/supervisor/field/import_node");
-  //
-  //  supervisor_field_import_node_srv.request.field = field;
-  //  supervisor_field_import_node_srv.request.position = 6;
-  //  supervisor_field_import_node_srv.request.filename = "cone_test.wbo";
-  //  if (supervisor_field_import_node_client.call(supervisor_field_import_node_srv) &&
-  //  supervisor_field_import_node_srv.response.success == 1)
-  //    ROS_INFO("New cone add in world.");
-  //  else
-  //    ROS_ERROR("Failed to call service field_import_node.");
 
   // The next 2 tests are commented but works if you want to use them.
   // Since they stop simulation we can't use them if we wants to do other tests afterwards

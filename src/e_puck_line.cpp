@@ -1,4 +1,4 @@
-// Copyright 1996-2020 Cyberbotics Ltd.
+// Copyright 1996-2022 Cyberbotics Ltd.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,11 +13,9 @@
 // limitations under the License.
 
 // line_following example
-// this example reproduce the e-puck_line_demo example
-// but uses the ROS controller on the e-puck instead.
-// The node connect to an e-puck and then uses values from its sensors
-// to follow and line and get around obstacles.
-// the duration of the example is given as argument to the node.
+// This example reproduce the e-puck_line_demo example but uses the ROS controller on the e-puck instead.
+// The node connect to an e-puck and then uses values from its sensors to follow and line and get around obstacles.
+// The duration of the example is given as argument to the node.
 
 #include "ros/ros.h"
 
@@ -100,12 +98,6 @@ void gsCallback(const sensor_msgs::Range::ConstPtr &value) {
   if (countGnd < NB_GROUND_SENS)
     gsValue[countGnd] = value->range;
   countGnd++;
-}
-
-void modelNameCallback(const std_msgs::String::ConstPtr &name) {
-  count++;
-  strcpy(modelList[count], name->data.c_str());
-  ROS_INFO("Model #%d: %s.", count, name->data.c_str());
 }
 
 void quit(int sig) {
@@ -234,10 +226,9 @@ void ObstacleAvoidanceModule(void) {
 ////////////////////////////////////////////
 // LLM - Line Leaving Module
 //
-// Since it has no output, this routine is not completely finished. It has
-// been designed to monitor the moment while the robot is leaving the
-// track and signal to other modules some related events. It becomes active
-// whenever the "side" variable displays a rising edge (changing from -1 to 0 or 1).
+// Since it has no output, this routine is not completely finished. It has been designed to monitor the moment while the robot
+// is leaving the track and signal to other modules some related events. It becomes active whenever the "side" variable displays
+// a rising edge (changing from -1 to 0 or 1).
 
 int llm_active = FALSE, llm_inibit_ofm_speed, llm_past_side = NO_SIDE;
 int lem_reset;
@@ -281,10 +272,9 @@ void LineLeavingModule(int side) {
 ////////////////////////////////////////////
 // OFM - Obstacle Following Module
 //
-// This function just gives the robot a tendency to steer toward the side
-// indicated by its argument "side". When used in competition with OAM it
-// gives rise to an object following behavior. The output speeds are
-// stored in ofm_speed[LEFT] and ofm_speed[RIGHT].
+// This function just gives the robot a tendency to steer toward the side indicated by its argument "side". When used in
+// competition with OAM it gives rise to an object following behavior. The output speeds are stored in ofm_speed[LEFT] and
+// ofm_speed[RIGHT].
 
 int ofm_active;
 int ofm_speed[2];
@@ -311,16 +301,12 @@ void ObstacleFollowingModule(int side) {
 ////////////////////////////////////////////
 // LEM - Line Entering Module
 //
-// This is the most complex module (and you might find easier to re-program it
-// by yourself instead of trying to understand it ;-). Its purpose is to handle
-// the moment when the robot must re-enter the track (after having by-passed
-// an obstacle, e.g.). It is organized like a state machine, which state is
-// stored in "lem_state" (see LEM_STATE_STANDBY and following #defines).
-// The inputs are (i) the two lateral ground sensors, (ii) the argument "side"
-// which determines the direction that the robot has to follow when detecting
-// a black line, and (iii) the variable "lem_reset" that resets the state to
-// standby. The output speeds are stored in lem_speed[LEFT] and
-// lem_speed[RIGHT].
+// This is the most complex module (and you might find easier to re-program it by yourself instead of trying to understand it
+// ;-). Its purpose is to handle the moment when the robot must re-enter the track (after having by-passed an obstacle, e.g.).
+// It is organized like a state machine, which state is stored in "lem_state" (see LEM_STATE_STANDBY and following #defines).
+// The inputs are (i) the two lateral ground sensors, (ii) the argument "side" which determines the direction that the robot has
+// to follow when detecting a black line, and (iii) the variable "lem_reset" that resets the state to standby. The output speeds
+// are stored in lem_speed[LEFT] and lem_speed[RIGHT].
 
 int lem_active;
 int lem_speed[2];
@@ -438,35 +424,12 @@ int main(int argc, char **argv) {
 
   signal(SIGINT, quit);
 
-  // declaration of variable names used to define services and topics name dynamically
-  std::string modelName;
-
-  // get the name of the robot
-  ros::Subscriber nameSub = n.subscribe("model_name", 100, modelNameCallback);
-  while (count == 0 || count < nameSub.getNumPublishers()) {
-    ros::spinOnce();
-    ros::spinOnce();
-    ros::spinOnce();
-  }
+  // Wait for the `ros` controller.
+  ros::service::waitForService("/robot/time_step");
   ros::spinOnce();
-  if (count == 1)
-    modelName = modelList[1];
-  else {
-    int wantedModel = 0;
-    std::cout << "Choose the # of the model you want to use:\n";
-    std::cin >> wantedModel;
-    if (1 <= wantedModel && wantedModel <= count)
-      modelName = modelList[wantedModel];
-    else {
-      ROS_ERROR("Invalid choice.");
-      return 1;
-    }
-  }
-  nameSub.shutdown();
-  count = 0;
 
   // send robot time step to webots
-  setTimeStepClient = n.serviceClient<webots_ros::set_int>(modelName + "/robot/time_step");
+  setTimeStepClient = n.serviceClient<webots_ros::set_int>("/robot/time_step");
   setTimeStepSrv.request.value = step;
 
   std::vector<ros::ServiceClient> enableDistSensorClient;
@@ -482,13 +445,13 @@ int main(int argc, char **argv) {
   ros::Subscriber SubDistIr[NB_DIST_SENS];
   for (i = 0; i < NB_DIST_SENS; i++) {
     sprintf(deviceName, "ps%d", i);
-    enableDistSensorClient.push_back(n.serviceClient<webots_ros::set_int>(modelName + '/' + deviceName + "/enable"));
+    enableDistSensorClient.push_back(n.serviceClient<webots_ros::set_int>("/" + std::string(deviceName) + "/enable"));
     enableDistSensorSrv.request.value = step;
     if (enableDistSensorClient[i].call(enableDistSensorSrv) && enableDistSensorSrv.response.success) {
       ROS_INFO("Device %s enabled.", deviceName);
       std::ostringstream s;
       s << step;
-      SubDistIr[i] = n.subscribe(modelName + '/' + deviceName + "/value", 1, psCallback);
+      SubDistIr[i] = n.subscribe("/" + std::string(deviceName) + "/value", 1, psCallback);
       while (SubDistIr[i].getNumPublishers() == 0) {
       }
     } else {
@@ -503,13 +466,13 @@ int main(int argc, char **argv) {
   ros::Subscriber SubGndIr[NB_GROUND_SENS];
   for (i = 0; i < NB_GROUND_SENS; i++) {
     sprintf(deviceName, "gs%d", i);
-    enableDistSensorClient.push_back(n.serviceClient<webots_ros::set_int>(modelName + '/' + deviceName + "/enable"));
+    enableDistSensorClient.push_back(n.serviceClient<webots_ros::set_int>("/" + std::string(deviceName) + "/enable"));
     enableDistSensorSrv.request.value = step;
     if (enableDistSensorClient[i + NB_DIST_SENS].call(enableDistSensorSrv) && enableDistSensorSrv.response.success) {
       ROS_INFO("Device %s enabled.", deviceName);
       std::ostringstream s;
       s << step;
-      SubGndIr[i] = n.subscribe(modelName + '/' + deviceName + "/value", 1, gsCallback);
+      SubGndIr[i] = n.subscribe("/" + std::string(deviceName) + "/value", 1, gsCallback);
       while (SubGndIr[i].getNumPublishers() == 0) {
       }
     } else {
@@ -523,22 +486,18 @@ int main(int argc, char **argv) {
   // set the motors to veloctiy control
   webots_ros::set_float wheelSrv;
   wheelSrv.request.value = INFINITY;
-  ros::ServiceClient leftWheelPositionClient =
-    n.serviceClient<webots_ros::set_float>(modelName + "/left_wheel_motor/set_position");
+  ros::ServiceClient leftWheelPositionClient = n.serviceClient<webots_ros::set_float>("/left_wheel_motor/set_position");
   leftWheelPositionClient.call(wheelSrv);
-  ros::ServiceClient rightWheelPositionClient =
-    n.serviceClient<webots_ros::set_float>(modelName + "/right_wheel_motor/set_position");
+  ros::ServiceClient rightWheelPositionClient = n.serviceClient<webots_ros::set_float>("/right_wheel_motor/set_position");
   rightWheelPositionClient.call(wheelSrv);
-  ros::ServiceClient leftWheelVelocityClient =
-    n.serviceClient<webots_ros::set_float>(modelName + "/left_wheel_motor/set_velocity");
-  ros::ServiceClient rightWheelVelocityClient =
-    n.serviceClient<webots_ros::set_float>(modelName + "/right_wheel_motor/set_velocity");
+  ros::ServiceClient leftWheelVelocityClient = n.serviceClient<webots_ros::set_float>("/left_wheel_motor/set_velocity");
+  ros::ServiceClient rightWheelVelocityClient = n.serviceClient<webots_ros::set_float>("/right_wheel_motor/set_velocity");
 
   // turn the leds on
   std::vector<ros::ServiceClient> setLedClient;
   webots_ros::set_int setLedSrv;
   sprintf(deviceName, "led0");
-  setLedClient.push_back(n.serviceClient<webots_ros::set_int>(modelName + '/' + deviceName + "/set_led"));
+  setLedClient.push_back(n.serviceClient<webots_ros::set_int>("/" + std::string(deviceName) + "/set_led"));
   setLedSrv.request.value = 1;
   if (setLedClient[0].call(setLedSrv) && setLedSrv.response.success)
     ROS_INFO("%s turned on!", deviceName);
@@ -547,7 +506,7 @@ int main(int argc, char **argv) {
     return 1;
   }
   sprintf(deviceName, "led8");
-  setLedClient.push_back(n.serviceClient<webots_ros::set_int>(modelName + '/' + deviceName + "/set_led"));
+  setLedClient.push_back(n.serviceClient<webots_ros::set_int>("/" + std::string(deviceName) + "/set_led"));
   setLedSrv.request.value = 1;
   if (setLedClient[1].call(setLedSrv) && setLedSrv.response.success)
     ROS_INFO("%s turned on!", deviceName);
@@ -650,6 +609,17 @@ int main(int argc, char **argv) {
     leftWheelVelocityClient.call(wheelSrv);
     wheelSrv.request.value = (M_PI / 1000.0) * speed[RIGHT];
     rightWheelVelocityClient.call(wheelSrv);
+
+    if (oam_active) {
+      ROS_WARN("The robot has bumped into an obstacle. Please complete the code in the \"LineLeavingModule()\" function of "
+               "\"%s\" or simply remove the obstacle to get a correct behavior.",
+               __FILE__);
+      wheelSrv.request.value = 0;
+      leftWheelVelocityClient.call(wheelSrv);
+      wheelSrv.request.value = 0;
+      rightWheelVelocityClient.call(wheelSrv);
+      break;
+    }
   }
 
   // turn off leds
