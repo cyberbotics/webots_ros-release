@@ -88,14 +88,14 @@ tracks:
       :{release_inc} --os-name fedora
     - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
       :{release_inc} --os-name rhel
-    devel_branch: noetic
+    devel_branch: master
     last_version: 2022.1.0
     name: webots_ros
     patches: null
     release_inc: '1'
     release_repo_url: null
-    release_tag: 2022.1.0
+    release_tag: 2023.0.0
     ros_distro: noetic
     vcs_type: git
     vcs_uri: https://github.com/cyberbotics/webots_ros.git
-    version: 2022.1.0
+    version: 2023.0.0
